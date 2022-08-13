@@ -31,6 +31,13 @@ migrate = Migrate(app, db)
 # Filters.
 #----------------------------------------------------------------------------#
 
+def format_datetime_from_raw(date, format='medium'):
+  if format == 'full':
+      format="EEEE MMMM, d, y 'at' h:mma"
+  elif format == 'medium':
+      format="EE MM, dd, y h:mma"
+  return babel.dates.format_datetime(date, format, locale='en')
+
 def format_datetime(value, format='medium'):
   date = dateutil.parser.parse(value)
   if format == 'full':
@@ -121,20 +128,29 @@ def show_venue(venue_id):
 	city = City.query.get(venue.city_id)
 	shows = venue.shows
 
+	past_shows_query = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time<datetime.today()).all()
 	past_shows = []
-	upcoming_shows = []
-	for show in shows:
-		artist = Artist.query.get(show.artist_id)
+	for show in past_shows_query:
+		venue = Venue.query.get(show.venue_id)
 		new_show = {
-			'artist_id': show.artist_id,
-			'artist_name': artist.name,
-			'artist_image_link': artist.image_link,
-			'start_time': show.start_time,
+			'venue_id': show.venue_id,
+			'venue_name': venue.name,
+			'venue_image_link': venue.image_link,
+			'start_time': format_datetime_from_raw(show.start_time),
 		}
-		if dateutil.parser.parse(show.start_time)<datetime.today():
-			past_shows.append(new_show)
-		else:
-			upcoming_shows.append(new_show)
+		past_shows.append(new_show)
+
+	upcoming_shows_query = db.session.query(Show).join(Artist).filter(Show.venue_id==venue_id).filter(Show.start_time>=datetime.today()).all()
+	upcoming_shows = []
+	for show in upcoming_shows_query:
+		venue = Venue.query.get(show.venue_id)
+		new_show = {
+			'venue_id': show.venue_id,
+			'venue_name': venue.name,
+			'venue_image_link': venue.image_link,
+			'start_time': format_datetime_from_raw(show.start_time),
+		}
+		upcoming_shows.append(new_show)
 
 	data = {
 		'name': venue.name,
@@ -242,20 +258,29 @@ def show_artist(artist_id):
 	city = City.query.get(artist.city_id)
 	shows = artist.shows
 
+	past_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time<datetime.today()).all()
 	past_shows = []
-	upcoming_shows = []
-	for show in shows:
+	for show in past_shows_query:
 		venue = Venue.query.get(show.venue_id)
 		new_show = {
 			'venue_id': show.venue_id,
 			'venue_name': venue.name,
 			'venue_image_link': venue.image_link,
-			'start_time': show.start_time,
+			'start_time': format_datetime_from_raw(show.start_time),
 		}
-		if dateutil.parser.parse(show.start_time)<datetime.today():
-			past_shows.append(new_show)
-		else:
-			upcoming_shows.append(new_show)
+		past_shows.append(new_show)
+
+	upcoming_shows_query = db.session.query(Show).join(Venue).filter(Show.artist_id==artist_id).filter(Show.start_time>=datetime.today()).all()
+	upcoming_shows = []
+	for show in upcoming_shows_query:
+		venue = Venue.query.get(show.venue_id)
+		new_show = {
+			'venue_id': show.venue_id,
+			'venue_name': venue.name,
+			'venue_image_link': venue.image_link,
+			'start_time': format_datetime_from_raw(show.start_time),
+		}
+		upcoming_shows.append(new_show)
 
 	data = {
 		'name': artist.name,
@@ -476,7 +501,7 @@ def shows():
 			'artist_id': show.artist_id,
 			'artist_name': artist.name if None!=artist else '',
 			'artist_image_link': artist.image_link if None!=artist else '',
-			'start_time': show.start_time
+			'start_time': format_datetime_from_raw(show.start_time)
 		})
 	return render_template('pages/shows.html', shows=data)
 

@@ -83,11 +83,11 @@ class VenueForm(Form):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
+        'phone', validators=[DataRequired()]
     )
     def validate_phone(self, field):
         regex = r'^[0-9]{3}-[0-9]{3}-[0-9]{4}$'
-        if '' != field.data and not re.search(regex, field.data):
+        if not re.search(regex, field.data):
             raise ValidationError("Invalid phone syntax")
     image_link = StringField(
         'image_link', validators=[Optional(), URL(message = 'Invalid image link')]
@@ -195,11 +195,11 @@ class ArtistForm(Form):
         ]
     )
     phone = StringField(
-        'phone'
+        'phone', validators=[DataRequired()]
     )
     def validate_phone(self, field):
         regex = r'^[0-9]{3}-[0-9]{3}-[0-9]{4}$'
-        if '' != field.data and not re.search(regex, field.data):
+        if not re.search(regex, field.data):
             raise ValidationError("Invalid phone syntax")
     image_link = StringField(
         'image_link', validators=[Optional(), URL(message = 'Invalid image link')]

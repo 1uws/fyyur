@@ -20,9 +20,9 @@ class Venue(db.Model):
 	__tablename__ = 'Venue'
 
 	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String)
+	name = db.Column(db.String, nullable=False)
 	address = db.Column(db.String(120))
-	phone = db.Column(db.String(120))
+	phone = db.Column(db.String(120), db.CheckConstraint(r"phone similar to '[0-9]{3}-[0-9]{3}-[0-9]{4}'"), nullable=False)
 	image_link = db.Column(db.String(500))
 	facebook_link = db.Column(db.String(120))
 	genres = db.relationship('Genre', secondary=Venue_genre, backref=db.backref('venues'))
@@ -36,8 +36,8 @@ class Artist(db.Model):
 	__tablename__ = 'Artist'
 
 	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String)
-	phone = db.Column(db.String(120))
+	name = db.Column(db.String, nullable=False)
+	phone = db.Column(db.String(120), db.CheckConstraint(r"phone similar to '[0-9]{3}-[0-9]{3}-[0-9]{4}'"), nullable=False)
 	image_link = db.Column(db.String(500))
 	facebook_link = db.Column(db.String(120))
 	city_id = db.Column(db.Integer, db.ForeignKey('City.id'), nullable=False)
@@ -66,6 +66,6 @@ class Show(db.Model):
 	__tablename__ = 'Show'
 
 	id = db.Column(db.Integer, primary_key=True)
-	start_time = db.Column(db.String(50))
+	start_time = db.Column(db.DateTime(), nullable=False)
 	venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
 	artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
