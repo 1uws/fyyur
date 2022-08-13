@@ -166,6 +166,12 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
+	form = VenueForm(request.form)
+	if not form.validate():
+		for n,e in form.errors.items():
+			flash(e[0])
+			break
+		return render_template('forms/new_venue.html', form=form)
 	try:
 		genres = db_add_genre(request.form.getlist('genres'))
 		city = db_add_city(request.form['city'], request.form['state'])
@@ -305,6 +311,12 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
+	form = ArtistForm(request.form)
+	if not form.validate():
+		for n,e in form.errors.items():
+			flash(e[0])
+			break
+		return redirect(url_for('edit_artist', artist_id=artist_id))
 	try:
 		genres = db_add_genre(request.form.getlist('genres'))
 		city = db_add_city(request.form['city'], request.form['state'])
@@ -366,6 +378,12 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
+	form = VenueForm(request.form)
+	if not form.validate():
+		for n,e in form.errors.items():
+			flash(e[0])
+			break
+		return redirect(url_for('edit_venue', venue_id=venue_id))
 	try:
 		genres = db_add_genre(request.form.getlist('genres'))
 		city = db_add_city(request.form['city'], request.form['state'])
@@ -404,6 +422,12 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
+	form = ArtistForm(request.form)
+	if not form.validate():
+		for n,e in form.errors.items():
+			flash(e[0])
+			break
+		return render_template('forms/new_artist.html', form=form)
 	try:
 		genres = db_add_genre(request.form.getlist('genres'))
 		city = db_add_city(request.form['city'], request.form['state'])
